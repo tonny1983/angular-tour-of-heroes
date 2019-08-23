@@ -1,0 +1,447 @@
+openapi: 3.0.1
+info:
+  title: Historic information related API
+  version: '7.11'
+servers:
+  - url: 'https://bpez.eorionsolution.com/engine-rest'
+components:
+  schemas:
+    GenericErrorInfo:
+      title: Some detail error information.
+      type: object
+      properties:
+        'type':
+          type: string
+          description: the name of exception class
+        message:
+          type: string
+          description: a detailed message
+    CountInfo:
+      title: Result object for all count APIs.
+      type: object
+      properties:
+        count:
+          type: integer
+          minimum: 0
+          description: the count number
+    HistoricProcessInstanceInfo:
+      title: A JSON array of historic process instance objects.
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the process instance.
+        rootProcessInstanceId:
+          type: string
+          description: The process instance id of the root process instance that initiated the process.
+        superProcessInstanceId:
+          type: string
+          description: The id of the parent process instance, if it exists.
+        superCaseInstanceId:
+          type: string
+          description: The id of the parent case instance, if it exists.
+        caseInstanceId:
+          type: string
+          description: The id of the parent case instance, if it exists.
+        processDefinitionName:
+          type: string
+          description: The name of the process definition that this process instance belongs to.
+        processDefinitionKey:
+          type: string
+          description: The key of the process definition that this process instance belongs to.
+        processDefinitionVersion:
+          type: string
+          description: The version of the process definition that this process instance belongs to.
+        processDefinitionId:
+          type: string
+          description: The id of the process definition that this process instance belongs to.
+        businessKey:
+          type: string
+          description: The business key of the process instance.
+        startTime:
+          type: string
+          format: 'date-time'
+          description: The time the instance was started. Default format yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+        endTime:
+          type: string
+          format: 'date-time'
+          description: The time the instance ended. Default format yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+        removalTime:
+          type: string
+          format: 'date-time'
+          description: The time after which the instance should be removed by the History Cleanup job. Default format yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+        durationInMillis:
+          type: integer
+          description: The time the instance took to finish (in milliseconds).
+        startUserId:
+          type: string
+          description: The id of the user who started the process instance.
+        startActivityId:
+          type: string
+          description: The id of the initial activity that was executed (e.g., a start event).
+        deleteReason:
+          type: string
+          description: The provided delete reason in case the process instance was canceled during execution.
+        tenantId:
+          type: string
+          description: The tenant id of the process instance.
+        state:
+          type: string
+          enum:
+            - 'ACTIVE'
+            - 'SUSPENDED'
+            - 'COMPLETED'
+            - 'EXTERNALLY_TERMINATED'
+            - 'INTERNALLY_TERMINATED'
+          description: Last state of the process instance.
+    HistoricTaskInfo:
+      title: A JSON array of task objects
+      type: object
+      properties:
+        id:
+          type: string
+          description: The task id.
+        processDefinitionKey:
+          type: string
+          description: The key of the process definition the task belongs to.
+        processDefinitionId:
+          type: string
+          description: The id of the process definition the task belongs to.
+        processInstanceId:
+          type: string
+          description: The id of the process instance the task belongs to.
+        executionId:
+          type: string
+          description: The id of the execution the task belongs to.
+        caseDefinitionKey:
+          type: string
+          description: The key of the case definition the task belongs to.
+        caseDefinitionId:
+          type: string
+          description: The id of the case definition the task belongs to.
+        caseInstanceId:
+          type: string
+          description: The id of the case instance the task belongs to.
+        caseExecutionId:
+          type: string
+          description: The id of the case execution the task belongs to.
+        activityInstanceId:
+          type: string
+          description: The id of the activity that this object is an instance of.
+        name:
+          type: string
+          description: The task name.
+        description:
+          type: string
+          description: The task's description.
+        deleteReason:
+          type: string
+          description: The task's delete reason.
+        owner:
+          type: string
+          description: The owner's id.
+        assignee:
+          type: string
+          description: The assignee's id.
+        startTime:
+          type: string
+          format: 'date-time'
+          description: The time the task was started. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+        endTime:
+          type: string
+          format: 'date-time'
+          description: The time the task ended. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+        duration:
+          type: integer
+          description: The time the task took to finish (in milliseconds).
+        taskDefinitionKey:
+          type: string
+          description: The task's key.
+        priority:
+          type: integer
+          description: The task's priority.
+        tenantId:
+          type: string
+          description: If not null, the tenant id of the task.
+        due:
+          type: string
+          format: 'date-time'
+          description: The task's due date. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+        parentTaskId:
+          type: string
+          description: The id of the parent task, if this task is a subtask.
+        followUp:
+          type: string
+          format: 'date-time'
+          description: The follow-up date for the task. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+        removalTime:
+          type: string
+          format: 'date-time'
+          description: The time after which the task should be removed by the History Cleanup job. Default format* yyyy-MM-dd'T'HH:mm:ss.SSSZ.
+        rootProcessInstanceId:
+          type: string
+          description: The process instance id of the root process instance that initiated the process containing this task.
+paths:
+  /history/process-instance/count:
+    get:
+      summary: Returns the number of historic process instances that fulfill the given parameters.
+      description: Queries for the number of historic process instances that fulfill the given parameters. Takes the same parameters as the Get Process Instances method..
+      operationId: getHistoricProcessInstaceCount
+      parameters:
+        - in: query
+          name: startedBy
+          schema:
+            type: string
+          description: Only include process instances that were started by the given user.
+          required: false
+        - in: query
+          name: unfinished
+          schema:
+            type: boolean
+            default: true
+          description: Only include unfinished process instances. Value may only be true, as false is the default behavior.
+          required: false
+        - in: query
+          name: finished
+          schema:
+            type: boolean
+            default: true
+          description: Only include finished process instances. Value may only be true, as false is the default behavior.
+          required: false
+        - in: query
+          name: tenantIdIn
+          schema:
+            type: string
+          description: Filter by a comma-separated list of tenant ids. A process instance must have one of the given tenant ids.
+          required: true
+      responses:
+        '200':
+          description: Request successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountInfo'
+        '400':
+          description: Returned if some of the query parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorInfo'
+  /history/process-instance:
+    get:
+      summary: Return the list of historic process instances.
+      description: Queries for historic process instances that fulfill the given parameters. The size of the result set can be retrieved by using the Get Process Instance Count method.
+      operationId: getHistoricProcessInstace
+      parameters:
+        - in: query
+          name: startedBy
+          schema:
+            type: string
+          description: Only include process instances that were started by the given user.
+          required: false
+        - in: query
+          name: unfinished
+          schema:
+            type: boolean
+            default: true
+          description: Only include unfinished process instances. Value may only be true, as false is the default behavior.
+          required: false
+        - in: query
+          name: finished
+          schema:
+            type: boolean
+            default: true
+          description: Only include finished process instances. Value may only be true, as false is the default behavior.
+          required: false
+        - in: query
+          name: tenantIdIn
+          schema:
+            type: string
+          description: Filter by a comma-separated list of tenant ids. A process instance must have one of the given tenant ids.
+          required: true
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            default: 'startTime'
+          description: Sort the results by a given criterion. Valid values are instanceId, definitionId, definitionKey, definitionName, definitionVersion, businessKey, startTime, endTime, duration and tenantId. Must be used in conjunction with the sortOrder parameter.
+          required: true
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum:
+              - 'desc'
+              - 'asc'
+            default: 'desc'
+          description: Sort the results in a given order. Values may be asc for ascending order or desc for descending order. Must be used in conjunction with the sortBy parameter.
+          required: true
+      responses:
+        200:
+          description: Request successful.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoricProcessInstanceInfo'
+        400:
+          description: Returned if some of the query parameters are invalid, for example if a sortOrder parameter is supplied, but no sortBy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorInfo'
+  /history/task:
+    get:
+      summary: Return the list of historic tasks.
+      description: Queries for historic tasks that fulfill the given parameters. The size of the result set can be retrieved by using the Get Task Count method.
+      operationId: getHistoricTasks
+      parameters:
+        - in: query
+          name: taskAssignee
+          schema:
+            type: string
+          description: Restrict to tasks that the given user is assigned to.
+          required: true
+        - in: query
+          name: taskOwner
+          schema:
+            type: string
+          description: Restrict to tasks that the given user owns.
+          required: false
+        - in: query
+          name: processInstanceId
+          schema:
+            type: string
+          description: Filter by process instance id.
+          required: false
+        - in: query
+          name: processDefinitionName
+          schema:
+            type: string
+          description: Restrict to tasks that belong to a process definition with the given name.
+          required: false
+        - in: query
+          name: taskId
+          schema:
+            type: string
+          description: Filter by task id.
+          required: false
+        - in: query
+          name: taskName
+          schema:
+            type: string
+          description: Restrict to tasks that have the given name.
+          required: false
+        - in: query
+          name: finishedAfter
+          schema:
+            type: string
+            format: 'date-time'
+          description: Restrict to tasks that were finished after the given date. By default*, the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200.
+          required: false
+        - in: query
+          name: finishedBefore
+          schema:
+            type: string
+            format: 'date-time'
+          description: Restrict to tasks that were finished before the given date. By default*, the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200.
+          required: false
+        - in: query
+          name: tenantIdIn
+          schema:
+            type: string
+          description: Filter by a comma-separated list of tenant ids. A task instance must have one of the given tenant ids.
+          required: true
+      responses:
+        200:
+          description: Request successful.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoricTaskInfo'
+        400:
+          description: Returned if some of the query parameters are invalid, for example if a sortOrder parameter is supplied, but no sortBy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorInfo'
+  /history/task/count:
+    get:
+      summary: Return the number of historic tasks that fulfill the given parameters.
+      description: Queries for the number of historic tasks that fulfill the given parameters. Takes the same parameters as the Get Tasks (Historic) method.
+      operationId: getHistoricTasksCount
+      parameters:
+        - in: query
+          name: taskAssignee
+          schema:
+            type: string
+          description: Restrict to tasks that the given user is assigned to.
+          required: true
+        - in: query
+          name: taskOwner
+          schema:
+            type: string
+          description: Restrict to tasks that the given user owns.
+          required: false
+        - in: query
+          name: processInstanceId
+          schema:
+            type: string
+            description: Filter by process instance id.
+          required: false
+        - in: query
+          name: processDefinitionName
+          schema:
+            type: string
+          description: Restrict to tasks that belong to a process definition with the given name.
+          required: false
+        - in: query
+          name: taskId
+          schema:
+            type: string
+          description: Filter by task id.
+          required: false
+        - in: query
+          name: taskName
+          schema:
+            type: string
+          description: Restrict to tasks that have the given name.
+          required: false
+        - in: query
+          name: finishedAfter
+          schema:
+            type: string
+            format: 'date-time'
+          description: Restrict to tasks that were finished after the given date. By default*, the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200.
+          required: false
+        - in: query
+          name: finishedBefore
+          schema:
+            type: string
+            format: 'date-time'
+          description: Restrict to tasks that were finished before the given date. By default*, the date must have the format yyyy-MM-dd'T'HH:mm:ss.SSSZ, e.g., 2013-01-23T14:42:45.000+0200.
+          required: false
+        - in: query
+          name: tenantIdIn
+          schema:
+            type: string
+          description: Filter by a comma-separated list of tenant ids. A task instance must have one of the given tenant ids.
+          required: true
+      responses:
+        200:
+          description: Request successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountInfo'
+        400:
+          description: Returned if some of the query parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorInfo'
+
+

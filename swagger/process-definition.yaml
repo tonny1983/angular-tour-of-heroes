@@ -1,0 +1,289 @@
+openapi: 3.0.1
+info:
+  title: process definition related API
+  version: '7.11'
+servers:
+  - url: 'https://bpez.eorionsolution.com/engine-rest'
+components:
+  schemas:
+    GenericErrorInfo:
+      title: Some detail error information.
+      type: object
+      properties:
+        'type':
+          type: string
+          description: the name of exception class
+        message:
+          type: string
+          description: a detailed message
+    CountInfo:
+      title: Result object for all count APIs.
+      type: object
+      properties:
+        count:
+          type: integer
+          minimum: 0
+          description: the count number
+    ProcessDefinition:
+      title: Procesee Definition Information.
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the process definition.
+        key:
+          type: string
+          description: The key of the process definition, i.e., the id of the BPMN 2.0 XML process definition.
+        category:
+          type: string
+          description: The category of the process definition.
+        description:
+          type: string
+          description: The description of the process definition.
+        name:
+          type: string
+          description: The name of the process definition.
+        version:
+          type: integer
+          description: The version of the process definition that the engine assigned to it.
+        resource:
+          type: string
+          description: The file name of the process definition.
+        deploymentId:
+          type: string
+          description: The deployment id of the process definition.
+        diagram:
+          type: string
+          description: The file name of the process definition diagram, if it exists.
+        suspended:
+          type: boolean
+          description: A flag indicating whether the definition is suspended or not.
+        tenantId:
+          type: string
+          description: The tenant id of the process definition.
+        versionTag:
+          type: string
+          description: The version tag of the process or null when no version tag is set.
+        historyTimeToLive:
+          type: integer
+          description: History time to live value of the process definition. Is used within History cleanup.
+        startableInTasklist:
+          type: boolean
+          description: A flag indicating whether the process definition is startable in Tasklist or not.
+    FormVariable:
+      title: A JSON object containing a property for each variable returned.
+      description: The key is the variable name, the value is a JSON object. For detail, pls refer to the (docs)[https://docs.camunda.org/manual/7.11/reference/rest/process-definition/get-form-variables/#result].
+      type: object
+    ProcessDefinitionXMLInfo:
+      title: A JSON object containing the id of the definition and the BPMN 2.0 XML.
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the process definition.
+        bpmn20Xml:
+          type: string
+          description: An escaped XML string containing the XML that this definition was deployed with. Carriage returns, line feeds and quotation marks are escaped.
+paths:
+  /process-definition/count:
+    get:
+      summary: Returns the number of process definitions that fulfill the query criteria.
+      operationId: getProcessDefinitionCount
+      description: Requests the number of process definitions that fulfill the query criteria. Takes the same filtering parameters as the Get Definitions method.
+      parameters:
+        - in: query
+          name: startableBy
+          schema:
+            type: string
+          description: Filter by a user name who is allowed to start the process.
+          required: true
+        - in: query
+          name: active
+          schema:
+            type: boolean
+            default: true
+          description: Only include active process definitions. Value may only be true, as false is the default behavior.
+          required: true
+        - in: query
+          name: latestVersion
+          schema:
+            type: boolean
+            default: true
+          description: Only include those process definitions that are latest versions. Value may only be true, as false is the default behavior.
+          required: false
+        - in: query
+          name: tenantIdIn
+          schema:
+            type: string
+          description: Filter by a comma-separated list of tenant ids. A process definition must have one of the given tenant ids.
+          required: true
+      responses:
+        '200':
+          description: Request successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountInfo'
+        '400':
+          description: Returned if some of the query parameters are invalid, for example if a sortOrder parameter is supplied, but no sortBy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorInfo'
+  /process-definition:
+    get:
+      summary: Returns the list of process definitions that fulfill the query criteria.
+      description: Queries for process definitions that fulfill given parameters. Parameters may be the properties of process definitions, such as the name, key or version. The size of the result set can be retrieved by using the Get Definition Count method.
+      operationId: getProcessDefinition
+      parameters:
+        - in: query
+          name: startableBy
+          schema:
+            type: string
+          description: Filter by a user name who is allowed to start the process.
+          required: true
+        - in: query
+          name: active
+          schema:
+            type: boolean
+            default: true
+          description: Only include active process definitions. Value may only be true, as false is the default behavior.
+          required: true
+        - in: query
+          name: latestVersion
+          schema:
+            type: boolean
+            default: true
+          description: Only include those process definitions that are latest versions. Value may only be true, as false is the default behavior.
+          required: false
+        - in: query
+          name: tenantIdIn
+          schema:
+            type: string
+          description: Filter by a comma-separated list of tenant ids. A process definition must have one of the given tenant ids.
+          required: true
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+          description: 'Sort the results lexicographically by a given criterion. Valid values are category, key, id, name, version, deploymentId, tenantId and versionTag. Must be used in conjunction with the sortOrder parameter. Note: Sorting by versionTag is string based. The version will not be interpreted. As an example, the sorting could return v0.1.0, v0.10.0, v0.2.0.'
+          required: false
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+            enum:
+              - 'desc'
+              - 'asc'
+          description: Sort the results in a given order. Values may be asc for ascending order or desc for descending order. Must be used in conjunction with the sortBy parameter.
+          required: false
+      responses:
+        '200':
+          description: Request successful.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessDefinition'
+        '400':
+          description: Returned if some of the query parameters are invalid, for example if a sortOrder parameter is supplied, but no sortBy.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GenericErrorInfo'
+  /process-definition/{id}/form-variables:
+    get:
+      summary: Get the start form variables for a process definition.
+      description: Retrieves the start form variables for a process definition (only if they are defined via the Generated Task Form approach). The start form variables take form data specified on the start event into account. If form fields are defined, the variable types and default values of the form fields are taken into account.
+      operationId: getFormVariables
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          description: The id of the process definition to retrieve the variables for.
+          required: true
+      responses:
+        '200':
+          description: Request successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormVariable'
+        '400':
+          description: Process definition with given key does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorInfo'
+  /process-definition/{id}/xml:
+    get:
+      summary: Retrieves the BPMN 2.0 XML of a process definition.
+      description: To render a process diagram, you need to retrieve the diagram XML via this API, and then render it using [bpmn.io](http://bpmn.io/) or [bpmn-viewer widget](http://camunda.github.io/camunda-commons-ui/cam-widget-bpmn-viewer.html). For detail, pls refer to the [docs](https://docs.camunda.org/manual/7.11/user-guide/process-engine/process-diagram-api/).
+      operationId: getProcessDefinitionXML
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          description: The id of the process definition.
+          required: true
+      responses:
+        '200':
+          description: Request successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessDefinitionXMLInfo'
+        '400':
+          description: Process definition with given key does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorInfo'
+  /process-definition/{id}/submit-form:
+    post:
+      summary: Starts a process instance using a set of process variables and the business key.
+      description: Starts a process instance using a set of process variables and the business key. If the start event has Form Field Metadata defined, the process engine will perform backend validation for any form fields which have validators defined.
+      operationId: submitForm
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          description: The id of the process definition to submit the form for.
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                variables:
+                  $ref: '#/components/schemas/FormVariable'
+      responses:
+        '204':
+          description: Request successful.
+        400:
+          description: The variable value or type is invalid, for example if the value could not be parsed to an Integer value or the passed variable type is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorInfo'
+        404:
+          description: Process definition with given key does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorInfo'
+        500:
+          description: The instance could not be created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorInfo'
+

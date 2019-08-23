@@ -1,0 +1,12 @@
+<div class="eo-language-select">
+  <div ngbDropdown class="dropdown">
+    <a class="dropdown-toggle" id="dropdownBasic1" ngbDropdownToggle>
+      <i class="fad fa-fw fa-language" style="margin-right: 9px"></i>语言选择
+    </a>
+    <div ngbDropdownMenu class="dropdown-area" aria-labelledby="dropdownBasic1">
+      <a class="dropdown-item" (click)="changeLanguage('zh-CN')" ngbDropdownItem>简体中文</a>
+      <a class="dropdown-item" (click)="changeLanguage('en-US')" ngbDropdownItem>English</a>
+      <a class="dropdown-item" (click)="changeLanguage('ja-JP')" ngbDropdownItem>日本語</a>
+    </div>
+  </div>
+</div>
