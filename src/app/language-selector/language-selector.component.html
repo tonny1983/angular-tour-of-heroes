@@ -9,4 +9,9 @@
       <a class="dropdown-item" (click)="changeLanguage('ja-JP')" ngbDropdownItem><i class="flag-icon flag-icon-jp" style="margin-right: 9px"></i>日本語</a>
     </div>
   </div>
+
+  <a class="isDisabled" [class.disabled]="true">
+    <i class="fad fa-fw fa-language" style="margin-right: 9px"></i>{{ 'lang.selector.title' | translate }}
+  </a>
+
 </div>
