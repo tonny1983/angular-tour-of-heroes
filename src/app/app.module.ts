@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { InMemoryDataService } from './in-memory-data.service';
 
@@ -17,6 +17,11 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 import { LanguageSelectorComponent } from './language-selector/language-selector.component';
+import { GlobalProcessSpinnerComponent } from './global-process-spinner/global-process-spinner.component';
+import {NgxSpinnerModule} from 'ngx-spinner';
+import {GlobalProcessSpinnerService} from './services/global-process-spinner.service';
+import {LoaderInterceptor} from './interceptors/loader.interceptor';
+import {MatProgressSpinnerModule} from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -26,7 +31,8 @@ import { LanguageSelectorComponent } from './language-selector/language-selector
     MessagesComponent,
     DashboardComponent,
     HeroSearchComponent,
-    LanguageSelectorComponent
+    LanguageSelectorComponent,
+    GlobalProcessSpinnerComponent
   ],
   imports: [
     BrowserModule,
@@ -40,10 +46,13 @@ import { LanguageSelectorComponent } from './language-selector/language-selector
         deps: [HttpClient]
       }
     }),
-    HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, {dataEncapsulation: false, passThruUnknownUrl: true}),
-    NgbDropdownModule
+    HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, {dataEncapsulation: false, passThruUnknownUrl: true, delay: 1500}),
+    NgbDropdownModule,
+    NgxSpinnerModule,
   ],
-  providers: [],
+  providers: [
+    GlobalProcessSpinnerService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

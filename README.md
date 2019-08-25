@@ -6,6 +6,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 * ng-angular component (popper in "language-selector")
 * ngx-translate component
+* global spinner between routing when loading data using ngx-spinner
+* partial spinner in pages (add Hero, change hero)  when waiting response using bootstrap spinner
 
 ## Development server
 

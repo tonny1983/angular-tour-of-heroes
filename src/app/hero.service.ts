@@ -3,7 +3,8 @@ import { Hero } from './hero';
 import { Observable, of } from 'rxjs';
 import { MessageService } from './message.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, map, tap } from 'rxjs/operators';
+import {catchError, finalize, map, tap} from 'rxjs/operators';
+import {GlobalProcessSpinnerService} from './services/global-process-spinner.service';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -16,7 +17,8 @@ export class HeroService {
 
   constructor(
     private messageService: MessageService,
-    private http: HttpClient
+    private http: HttpClient,
+    private gpsService: GlobalProcessSpinnerService
   ) { }
 
   public heroesUrl = 'api/heroes';
@@ -27,18 +29,22 @@ export class HeroService {
 
   getHero(id: number): Observable<Hero> {
     const url = `${this.heroesUrl}/${id}`;
+    this.gpsService.show();
     return this.http.get<Hero>(url).pipe(
       tap(_ => this.log(`fetched hero id=${id}`)),
-      catchError(this.handleError<Hero>(`getHero id=${id}`))
+      catchError(this.handleError<Hero>(`getHero id=${id}`)),
+      finalize(() => this.gpsService.hide())
     );
   }
 
   getHeroes(): Observable<Hero[]> {
     this.messageService.add('HeroService: fetched heroes');
+    this.gpsService.show();
     return  this.http.get<Hero[]>(this.heroesUrl)
       .pipe(
         tap(_ => this.log('fetched heroes')),
-        catchError(this.handleError<Hero[]>('getHeroes', []))
+        catchError(this.handleError<Hero[]>('getHeroes', [])),
+        finalize(() => this.gpsService.hide())
       );
   }
 

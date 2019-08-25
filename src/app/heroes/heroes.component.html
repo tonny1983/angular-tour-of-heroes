@@ -4,9 +4,14 @@
     <input #heroName />
   </label>
   <!-- (click) passes input value to add() and then clears the input -->
-  <button (click)="add(heroName.value); heroName.value=''">
+  <button (click)="add(heroName.value); heroName.value=''" [disabled]="isSaving$ | async">
     add
   </button>
+  <span *ngIf="isSaving$ | async" class="text-primary"></span>
+  <span *ngIf="isSaving$ | async" class="text-primary"></span>
+  <span *ngIf="isSaving$ | async" class="text-primary"></span>
+    <div *ngIf="isSaving$ | async" class="spinner-border spinner-border-sm text-primary" role="status"></div>
+    <span *ngIf="isSaving$ | async" class="text-primary"></span><span *ngIf="isSaving$ | async" class="text-secondary" style="margin-left: 9px">Saving...</span>
 </div>
 <ul class="heroes">
   <li *ngFor="let hero of heroes">

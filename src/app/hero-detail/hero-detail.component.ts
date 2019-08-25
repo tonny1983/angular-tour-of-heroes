@@ -3,6 +3,7 @@ import { Hero } from '../hero';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { HeroService } from '../hero.service';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-hero-detail',
@@ -13,9 +14,12 @@ export class HeroDetailComponent implements OnInit {
 
   @Input() hero: Hero;
 
+  isLoading$ = new Subject<boolean>();
+
   getHero(): void {
     const id = +this.activatedRoute.snapshot.paramMap.get('id');
     this.heroService.getHero(id).subscribe(h => this.hero = h);
+    this.isLoading$.next(false);
   }
 
   constructor(
@@ -33,8 +37,9 @@ export class HeroDetailComponent implements OnInit {
   }
 
   save(): void {
+    this.isLoading$.next(true);
     this.heroService.updateHero(this.hero)
-      .subscribe(() => this.goBack());
+      .subscribe(() => this.isLoading$.next(false));
   }
 
 }

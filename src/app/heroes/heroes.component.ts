@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Hero } from '../hero';
 import { HeroService } from '../hero.service';
 import { MessageService } from '../message.service';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-heroes',
@@ -10,6 +11,8 @@ import { MessageService } from '../message.service';
 })
 export class HeroesComponent implements OnInit {
   heroes: Hero[];
+
+  isSaving$ = new Subject<boolean>();
 
   getHeroes(): void {
      this.heroService.getHeroes().subscribe(h => this.heroes = h);
@@ -22,11 +25,13 @@ export class HeroesComponent implements OnInit {
   }
 
   add(name: string): void {
+    this.isSaving$.next(true);
     name = name.trim();
     if (!name) { return; }
     this.heroService.addHero({ name } as Hero)
       .subscribe(hero => {
         this.heroes.push(hero);
+        this.isSaving$.next(false);
       });
   }
 

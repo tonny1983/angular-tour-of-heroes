@@ -7,5 +7,11 @@
     </label>
   </div>
 </div>
-<button (click)="goBack()">go back</button>
-<button (click)="save()">save</button>
+<button (click)="goBack()">go back</button>&nbsp;&nbsp;&nbsp;
+<button (click)="save()" [disabled]="isLoading$ | async">
+  <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-ssm" role="status" aria-hidden="true" style="margin: auto"></span>
+  <span *ngIf="isLoading$ | async" class="text-primary"></span>
+  <span *ngIf="isLoading$ | async" class="text-primary"></span>
+  <span *ngIf="isLoading$ | async" class="text-primary"></span>
+  save
+</button>
