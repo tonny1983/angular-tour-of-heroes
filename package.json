@@ -26,6 +26,7 @@
     "flag-icon-css": "^3.3.0",
     "ngx-spinner": "^8.0.3",
     "rxjs": "~6.4.0",
+    "rxjs-observe": "^2.1.4",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"
   },

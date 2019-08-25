@@ -21,7 +21,7 @@ import { GlobalProcessSpinnerComponent } from './global-process-spinner/global-p
 import {NgxSpinnerModule} from 'ngx-spinner';
 import {GlobalProcessSpinnerService} from './services/global-process-spinner.service';
 import {LoaderInterceptor} from './interceptors/loader.interceptor';
-import {MatProgressSpinnerModule} from '@angular/material';
+import {HeroService} from './hero.service';
 
 @NgModule({
   declarations: [
@@ -52,6 +52,7 @@ import {MatProgressSpinnerModule} from '@angular/material';
   ],
   providers: [
     GlobalProcessSpinnerService,
+    {provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true, deps: [GlobalProcessSpinnerService]}
   ],
   bootstrap: [AppComponent]
 })

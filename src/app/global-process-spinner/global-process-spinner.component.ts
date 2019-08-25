@@ -11,7 +11,6 @@ export class GlobalProcessSpinnerComponent implements OnInit {
 
   constructor(private spinner: NgxSpinnerService, private gpsService: GlobalProcessSpinnerService) {
     this.gpsService.isLoading.subscribe(s => {
-      console.log(s);
       s ? this.spinner.show() : this.spinner.hide();
     });
   }
