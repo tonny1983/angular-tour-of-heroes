@@ -26,7 +26,7 @@ export class HeroSearchComponent implements OnInit {
     this.heroes$ = this.term.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      switchMap((t: string) => this.heroService.searchHeroes(t)),
+      switchMap((t: string) => this.heroService.searchHeroes(t, true)),
     );
   }
 

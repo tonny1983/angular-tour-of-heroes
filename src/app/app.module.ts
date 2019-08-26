@@ -22,6 +22,7 @@ import {NgxSpinnerModule} from 'ngx-spinner';
 import {GlobalProcessSpinnerService} from './services/global-process-spinner.service';
 import {LoaderInterceptor} from './interceptors/loader.interceptor';
 import {HeroService} from './hero.service';
+import { HeroDropdownComponent } from './hero-dropdown/hero-dropdown.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import {HeroService} from './hero.service';
     DashboardComponent,
     HeroSearchComponent,
     LanguageSelectorComponent,
-    GlobalProcessSpinnerComponent
+    GlobalProcessSpinnerComponent,
+    HeroDropdownComponent
   ],
   imports: [
     BrowserModule,
@@ -52,7 +54,8 @@ import {HeroService} from './hero.service';
   ],
   providers: [
     GlobalProcessSpinnerService,
-    {provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true, deps: [GlobalProcessSpinnerService]}
+    {provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true, deps: [GlobalProcessSpinnerService]},
+    {provide: 'ngxSpinnerModule', useFactory: () => () => new NgxSpinnerModule(), multi: true},
   ],
   bootstrap: [AppComponent]
 })

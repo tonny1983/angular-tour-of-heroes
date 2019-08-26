@@ -1,0 +1,15 @@
+<div class="eo-language-select">
+  <div ngbDropdown class="dropdown">
+    <a class="dropdown-toggle" id="dropdownBasic1" ngbDropdownToggle (click)="getHeroes()">
+      <i class="fad fa-fw fa-language" style="margin-right: 9px"></i>英雄列表 -- partial spinner
+    </a>
+    <div ngbDropdownMenu class="dropdown-area" aria-labelledby="dropdownBasic1">
+      <ngx-spinner [fullScreen]="false" name="dropdown-spinner" type="ball-clip-rotate-multiple" size="medium">
+        <p class="loading">Loading Awesomeness...</p>
+      </ngx-spinner>
+      <a *ngFor="let hero of heroes" class="dropdown-item" ngbDropdownItem>
+        <i style="margin-right: 9px"></i>{{hero.name}}
+      </a>
+    </div>
+  </div>
+</div>

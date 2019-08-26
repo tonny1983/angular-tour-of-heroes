@@ -5,18 +5,23 @@ import {GlobalProcessSpinnerService} from '../services/global-process-spinner.se
 import {finalize} from 'rxjs/operators';
 import {log} from 'util';
 
+export const InterceptorSkipHeader = 'X-Skip-Interceptor';
+
 @Injectable()
 export class LoaderInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (req.url.search('name=') === -1) {
+    if (req.headers.has(InterceptorSkipHeader)) {
+      log('has');
+      const headers = req.headers.delete(InterceptorSkipHeader);
+      return next.handle(req.clone({ headers }));
+    } else {
+      log('none');
       this.service.show();
       return next.handle(req).pipe(
         finalize(() => {
           this.service.hide();
         })
       );
-    } else {
-      return next.handle(req);
     }
   }
 
